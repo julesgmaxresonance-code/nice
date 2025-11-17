@@ -10,6 +10,12 @@
         if (!response.ok) throw new Error('Failed to load advice');
         const adviceList = await response.json();
 
+        if (adviceList.length === 0) {
+            text.textContent = 'There is no advice to give. Please come back later.';
+            btn.disabled = true;
+            return;
+        }
+
         btn.disabled = false;
         text.textContent = 'Click the button to get some questionable advice.';
 
