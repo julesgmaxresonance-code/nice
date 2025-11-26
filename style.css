@@ -1,19 +1,25 @@
 :root {
-    --bg-color: #f0f0f0;
-    --container-bg: #fff;
+    --bg-color: #fffbea; /* Light yellow background */
+    --container-bg: #fffdf5; /* Slightly lighter yellow/white */
     --text-color: #333;
-    --button-bg: #007bff;
+    --button-bg: #f59e0b; /* Cheesy orange/gold */
     --button-text: #fff;
-    --advice-bg: #f9f9f9;
-    --advice-border: #ddd;
+    --advice-bg: #fff;
+    --advice-border: #fcd34d; /* Yellow border */
     --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 body {
-    font-family: sans-serif;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif; /* Cheesy font choice */
     text-align: center;
     background-color: var(--bg-color);
     color: var(--text-color);
+    /* Swiss cheese holes pattern */
+    background-image:
+        radial-gradient(#fcd34d 15%, transparent 16%),
+        radial-gradient(#fcd34d 15%, transparent 16%);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
 }
 
 .container {
@@ -21,41 +27,70 @@ body {
     margin: 50px auto;
     padding: 20px;
     background-color: var(--container-bg);
-    border-radius: 10px;
-    box-shadow: 0 0 10px var(--shadow-color);
+    border-radius: 20px; /* Softer edges */
+    border: 2px solid #fbbf24;
+    box-shadow: 0 0 15px var(--shadow-color);
+}
+
+h1 {
+    color: #d97706; /* Darker orange for text */
 }
 
 button {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 12px 24px;
+    font-size: 18px;
+    font-weight: bold;
     cursor: pointer;
     background-color: var(--button-bg);
     color: var(--button-text);
     border: none;
-    border-radius: 5px;
+    border-radius: 50px; /* Rounder button */
+    transition: transform 0.1s ease, background-color 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+button:hover {
+    background-color: #d97706;
+    transform: scale(1.05);
+}
+
+button:active {
+    transform: scale(0.95);
 }
 
 button:disabled {
-    background-color: #ccc;
+    background-color: #fcd34d;
     cursor: not-allowed;
+    transform: none;
 }
 
 #advice-container {
-    margin-top: 20px;
-    padding: 20px;
+    margin-top: 30px;
+    padding: 30px;
     background-color: var(--advice-bg);
-    border: 1px solid var(--advice-border);
-    border-radius: 5px;
+    border: 3px dashed var(--advice-border);
+    border-radius: 15px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#advice-text {
+    font-size: 1.2em;
+    font-style: italic;
+    line-height: 1.5;
 }
 
 #loading-spinner {
-    border: 4px solid var(--bg-color);
-    border-top: 4px solid var(--button-bg);
+    border: 5px solid #fff;
+    border-top: 5px solid var(--button-bg);
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     animation: spin 1s linear infinite;
-    margin: 20px auto;
+    margin: 0 auto;
 }
 
 @keyframes spin {
