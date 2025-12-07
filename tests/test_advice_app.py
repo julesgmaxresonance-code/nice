@@ -21,19 +21,18 @@ def test_initial_state(page: Page):
     page.goto(f"http://localhost:{PORT}")
 
     # Check title
-    expect(page).to_have_title("Questionable Advice")
+    expect(page).to_have_title("Cheesy Advice Generator")
 
     # Check heading
-    expect(page.locator("h1")).to_have_text("Questionable Advice Generator")
+    expect(page.locator("h1")).to_have_text("Cheesy Advice Generator")
 
-    # Check initial instruction text (it loads fast so it might be "Click the button..." or "Loading advice...")
-    # Since we are testing the real app, it fetches advice.json immediately.
-    # We can intercept the request to ensure we see "Loading advice..." if we want,
-    # but for a general test, we expect the final state or loading state.
+    # Check initial instruction text
+    expect(page.locator("#advice-text")).to_have_text("Click the button to get some grate advice.")
 
-    # Let's verify the button exists
+    # Let's verify the button exists and has correct text
     btn = page.locator("#get-advice-btn")
     expect(btn).to_be_visible()
+    expect(btn).to_have_text("Get Some Gouda Advice")
 
 def test_advice_loaded(page: Page):
     """Verifies that advice loads and the button becomes enabled."""
@@ -59,33 +58,28 @@ def test_get_advice(page: Page):
     # Click the button
     btn.click()
 
-    # Verify text matches format: "..." ...but idk tho
-    expect(text).to_contain_text("...but idk tho")
+    # Verify text matches format: "..." - The Big Cheese
+    expect(text).to_contain_text("- The Big Cheese")
     expect(text).to_contain_text('"')
 
 def test_fetch_error(page: Page):
     """Verifies error handling when fetch fails."""
-    # Intercept the request to advice.json and fail it
-    page.route("**/advice.json", lambda route: route.abort())
+    # Intercept the request to api.adviceslip.com/advice and fail it
+    page.route("**/advice", lambda route: route.abort())
 
     page.goto(f"http://localhost:{PORT}")
+
+    # We must ensure we don't hit the 10% random joke chance which doesn't use the network.
+    # To do this reliably, we might need to mock Math.random, but for now,
+    # since we can't easily inject JS before load in this setup to mock Math.random perfectly
+    # without modifying the source, we will rely on retries or just hope
+    # the 10% chance doesn't hit.
+    # OR better, we can mock `Math.random` using `page.add_init_script`.
+
+    page.add_init_script("Math.random = () => 0.5;") # Force non-joke path
+
+    btn = page.locator("#get-advice-btn")
+    btn.click()
 
     text = page.locator("#advice-text")
     expect(text).to_contain_text("Failed to load advice")
-
-def test_empty_advice(page: Page):
-    """Verifies behavior when advice list is empty."""
-    # Intercept request and return empty array
-    page.route("**/advice.json", lambda route: route.fulfill(
-        status=200,
-        content_type="application/json",
-        body="[]"
-    ))
-
-    page.goto(f"http://localhost:{PORT}")
-
-    text = page.locator("#advice-text")
-    btn = page.locator("#get-advice-btn")
-
-    expect(text).to_contain_text("There is no advice to give")
-    expect(btn).to_be_disabled()
