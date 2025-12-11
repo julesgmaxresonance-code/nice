@@ -67,19 +67,95 @@ def test_fetch_error(page: Page):
     # Intercept the request to api.adviceslip.com/advice and fail it
     page.route("**/advice", lambda route: route.abort())
 
+    # Force non-joke path to trigger fetch
+    page.add_init_script("Math.random = () => 0.5;")
+
     page.goto(f"http://localhost:{PORT}")
-
-    # We must ensure we don't hit the 10% random joke chance which doesn't use the network.
-    # To do this reliably, we might need to mock Math.random, but for now,
-    # since we can't easily inject JS before load in this setup to mock Math.random perfectly
-    # without modifying the source, we will rely on retries or just hope
-    # the 10% chance doesn't hit.
-    # OR better, we can mock `Math.random` using `page.add_init_script`.
-
-    page.add_init_script("Math.random = () => 0.5;") # Force non-joke path
 
     btn = page.locator("#get-advice-btn")
     btn.click()
 
     text = page.locator("#advice-text")
     expect(text).to_contain_text("Failed to load advice")
+
+def test_cheeseify_logic(page: Page):
+    """Verifies that advice text is correctly 'cheeseified'."""
+    # Mock the API response with specific text to test replacements
+    page.route("**/advice", lambda route: route.fulfill(
+        status=200,
+        body='{"slip": { "id": 1, "advice": "Hello friend, I believe this is good." }}'
+    ))
+
+    # Force non-joke path
+    page.add_init_script("Math.random = () => 0.5;")
+
+    page.goto(f"http://localhost:{PORT}")
+
+    btn = page.locator("#get-advice-btn")
+    text = page.locator("#advice-text")
+
+    btn.click()
+
+    # Expected replacements:
+    # "Hello" -> "hallo-umi"
+    # "friend" -> "friend-cheese"
+    # "believe" -> "brie-lieve"
+    # "good" -> "gouda"
+    expect(text).to_contain_text("hallo-umi friend-cheese, I brie-lieve this is gouda.")
+
+def test_random_cheese_joke(page: Page):
+    """Verifies the 10% chance of getting a pure cheese joke."""
+    # Force joke path (Math.random < 0.1)
+    # Return 0.05. Logic: Math.floor(0.05 * 10) = 0 => First joke.
+    page.add_init_script("Math.random = () => 0.05;")
+
+    page.goto(f"http://localhost:{PORT}")
+
+    btn = page.locator("#get-advice-btn")
+    text = page.locator("#advice-text")
+
+    btn.click()
+
+    expected_joke = "What cheese can be used to hide a horse? Mascarpone."
+
+    expect(text).to_contain_text(expected_joke)
+    expect(text).to_contain_text("- The Big Cheese")
+
+def test_loading_state(page: Page):
+    """Verifies the loading spinner and button state during fetch."""
+
+    route_container = []
+
+    def handler(route):
+        route_container.append(route)
+        # Do not fulfill here to keep request pending
+
+    page.route("**/advice", handler)
+
+    # Force non-joke path so it fetches advice
+    page.add_init_script("Math.random = () => 0.5;")
+    page.goto(f"http://localhost:{PORT}")
+
+    btn = page.locator("#get-advice-btn")
+    spinner = page.locator("#loading-spinner")
+
+    btn.click()
+
+    # Check state while request is pending (intercepted but not fulfilled)
+    # The spinner should become visible
+    expect(spinner).to_be_visible()
+    expect(btn).to_be_disabled()
+
+    # Fulfill the request
+    # We expect the route to be captured
+    assert len(route_container) > 0, "Request was not captured"
+    route = route_container[0]
+    route.fulfill(
+        status=200,
+        body='{"slip": { "id": 123, "advice": "Patience is a virtue." }}'
+    )
+
+    # Verify final state
+    expect(spinner).not_to_be_visible()
+    expect(btn).to_be_enabled()
+    expect(page.locator("#advice-text")).to_contain_text("Patience is a virtue")
