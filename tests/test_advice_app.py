@@ -47,6 +47,14 @@ def test_advice_loaded(page: Page):
 
 def test_get_advice(page: Page):
     """Verifies that clicking the button displays advice."""
+    # Mock the API response to avoid external dependency
+    page.route("**/advice", lambda route: route.fulfill(
+        status=200,
+        body='{"slip": { "id": 42, "advice": "Always trust a smiling cat." }}'
+    ))
+    # Force the non-joke path to ensure fetch happens
+    page.add_init_script("Math.random = () => 0.5;")
+
     page.goto(f"http://localhost:{PORT}")
 
     btn = page.locator("#get-advice-btn")
@@ -59,6 +67,7 @@ def test_get_advice(page: Page):
     btn.click()
 
     # Verify text matches format: "..." - The Big Cheese
+    expect(text).to_contain_text("Always trust a smiling cat.")
     expect(text).to_contain_text("- The Big Cheese")
     expect(text).to_contain_text('"')
 
