@@ -1,20 +1,8 @@
 import pytest
 from playwright.sync_api import Page, expect
-import threading
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 # Define the server port
 PORT = 8000
-
-@pytest.fixture(scope="module", autouse=True)
-def http_server():
-    """Starts a simple HTTP server in a separate thread."""
-    server = HTTPServer(("", PORT), SimpleHTTPRequestHandler)
-    thread = threading.Thread(target=server.serve_forever)
-    thread.daemon = True
-    thread.start()
-    yield
-    server.shutdown()
 
 def test_initial_state(page: Page):
     """Verifies the initial state of the page."""
