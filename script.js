@@ -38,13 +38,18 @@ const PURE_CHEESE_JOKES = [
     "What's a cheese's favorite philosophy? I think, therefore I yam... wait, I think, therefore I camembert."
 ];
 
+// Pre-compile regexes to avoid memory leaks/performance issues
+const CHEESE_PUN_REGEXES = Object.entries(CHEESE_PUNS).map(([key, value]) => ({
+    regex: new RegExp(`\\b${key}\\b`, 'gi'),
+    value: value
+}));
+
 /**
  * Replaces common words with cheese puns.
  * @param {string} text - The original text.
  * @returns {string} The cheeseified text.
  */
 function cheeseify(text) {
-    let lowerText = text.toLowerCase();
     // Simple replacement - this could be more sophisticated with regex to preserve case
     // but for "questionable advice" simple replace is fine.
 
@@ -54,8 +59,7 @@ function cheeseify(text) {
     // Let's iterate over keys and replace with regex to match whole words or parts
     // For this simple app, case-insensitive replace is good.
 
-    for (const [key, value] of Object.entries(CHEESE_PUNS)) {
-        const regex = new RegExp(`\\b${key}\\b`, 'gi');
+    for (const {regex, value} of CHEESE_PUN_REGEXES) {
         text = text.replace(regex, value);
     }
     return text;
