@@ -93,7 +93,7 @@ function handleError(error) {
 }
 
 /**
- * Handles the click event for the "Get Some 'Advice'" button.
+ * Handles the click event for the "Get Some Gouda Advice" button.
  */
 async function handleGetAdviceClick() {
     GET_ADVICE_BTN.disabled = true;
