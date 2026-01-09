@@ -38,40 +38,39 @@ const PURE_CHEESE_JOKES = [
     "What's a cheese's favorite philosophy? I think, therefore I yam... wait, I think, therefore I camembert."
 ];
 
+// Pre-compile regex for single-pass replacement
+const CHEESE_PUN_REGEX = new RegExp(`\\b(${Object.keys(CHEESE_PUNS).join('|')})\\b`, 'gi');
+
 /**
  * Replaces common words with cheese puns.
  * @param {string} text - The original text.
  * @returns {string} The cheeseified text.
  */
 function cheeseify(text) {
-    let lowerText = text.toLowerCase();
-    // Simple replacement - this could be more sophisticated with regex to preserve case
-    // but for "questionable advice" simple replace is fine.
-
-    // We split by word to avoid replacing inside words incorrectly, mostly.
-    // Actually, simple replaceAll might be funnier/messier.
-
-    // Let's iterate over keys and replace with regex to match whole words or parts
-    // For this simple app, case-insensitive replace is good.
-
-    for (const [key, value] of Object.entries(CHEESE_PUNS)) {
-        const regex = new RegExp(`\\b${key}\\b`, 'gi');
-        text = text.replace(regex, value);
-    }
-    return text;
+    return text.replace(CHEESE_PUN_REGEX, (match) => CHEESE_PUNS[match.toLowerCase()] || match);
 }
 
+let lastAdvice = null;
+let lastFetchTime = 0;
 
 /**
  * Fetches advice from the Advice Slip API.
  * @returns {Promise<string>} A promise that resolves to a single advice string.
  */
 async function fetchAdvice() {
+    const now = Date.now();
+    // Use cached advice if within 2 seconds
+    if (lastAdvice && (now - lastFetchTime < 2000)) {
+        return lastAdvice;
+    }
+
     const response = await fetch('https://api.adviceslip.com/advice');
     if (!response.ok) {
         throw new Error('Failed to load advice');
     }
     const data = await response.json();
+    lastAdvice = data.slip.advice;
+    lastFetchTime = now;
     return data.slip.advice;
 }
 
