@@ -2,7 +2,7 @@
     --bg-color: #fffbea; /* Light yellow background */
     --container-bg: #fffdf5; /* Slightly lighter yellow/white */
     --text-color: #333;
-    --button-bg: #f59e0b; /* Cheesy orange/gold */
+    --button-bg: #b45309; /* Cheesy orange/gold */
     --button-text: #fff;
     --advice-bg: #fff;
     --advice-border: #fcd34d; /* Yellow border */
@@ -33,7 +33,7 @@ body {
 }
 
 h1 {
-    color: #d97706; /* Darker orange for text */
+    color: #b45309; /* Darker orange for text */
 }
 
 button {
