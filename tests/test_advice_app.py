@@ -47,6 +47,15 @@ def test_advice_loaded(page: Page):
 
 def test_get_advice(page: Page):
     """Verifies that clicking the button displays advice."""
+    # Mock the API to avoid external dependencies and flakiness
+    page.route("**/advice", lambda route: route.fulfill(
+        status=200,
+        body='{"slip": { "id": 1, "advice": "Test advice." }}'
+    ))
+
+    # Force non-joke path to ensure we test the fetch logic
+    page.add_init_script("Math.random = () => 0.5;")
+
     page.goto(f"http://localhost:{PORT}")
 
     btn = page.locator("#get-advice-btn")
@@ -61,6 +70,22 @@ def test_get_advice(page: Page):
     # Verify text matches format: "..." - The Big Cheese
     expect(text).to_contain_text("- The Big Cheese")
     expect(text).to_contain_text('"')
+
+def test_color_contrast(page: Page):
+    """Verifies that the button and heading use the accessible color #b45309."""
+    page.goto(f"http://localhost:{PORT}")
+
+    # Check button background
+    btn = page.locator("#get-advice-btn")
+    # Get computed background color
+    bg_color = btn.evaluate("el => getComputedStyle(el).backgroundColor")
+    # #b45309 is rgb(180, 83, 9)
+    assert bg_color == "rgb(180, 83, 9)", f"Expected rgb(180, 83, 9) but got {bg_color}"
+
+    # Check heading color
+    h1 = page.locator("h1")
+    text_color = h1.evaluate("el => getComputedStyle(el).color")
+    assert text_color == "rgb(180, 83, 9)", f"Expected rgb(180, 83, 9) but got {text_color}"
 
 def test_fetch_error(page: Page):
     """Verifies error handling when fetch fails."""
