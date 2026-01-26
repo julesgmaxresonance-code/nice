@@ -21,18 +21,18 @@ def test_initial_state(page: Page):
     page.goto(f"http://localhost:{PORT}")
 
     # Check title
-    expect(page).to_have_title("Cheesy Advice Generator")
+    expect(page).to_have_title("Gouda Guidance Generator")
 
     # Check heading
-    expect(page.locator("h1")).to_have_text("Cheesy Advice Generator")
+    expect(page.locator("h1")).to_have_text("Gouda Guidance Generator")
 
     # Check initial instruction text
-    expect(page.locator("#advice-text")).to_have_text("Click the button to get some grate advice.")
+    expect(page.locator("#advice-text")).to_have_text("Click Control to Collect Cheesy Counsel.")
 
     # Let's verify the button exists and has correct text
     btn = page.locator("#get-advice-btn")
     expect(btn).to_be_visible()
-    expect(btn).to_have_text("Get Some Gouda Advice")
+    expect(btn).to_have_text("Get Good Gouda Guidance")
 
 def test_advice_loaded(page: Page):
     """Verifies that advice loads and the button becomes enabled."""
@@ -42,7 +42,7 @@ def test_advice_loaded(page: Page):
     text = page.locator("#advice-text")
     btn = page.locator("#get-advice-btn")
 
-    expect(text).to_contain_text("Click the button")
+    expect(text).to_contain_text("Click Control")
     expect(btn).to_be_enabled()
 
 def test_get_advice(page: Page):
@@ -76,7 +76,7 @@ def test_fetch_error(page: Page):
     btn.click()
 
     text = page.locator("#advice-text")
-    expect(text).to_contain_text("Failed to load advice")
+    expect(text).to_contain_text("Fatal Fetch Failure")
 
 def test_cheeseify_logic(page: Page):
     """Verifies that advice text is correctly 'cheeseified'."""

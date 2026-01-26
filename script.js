@@ -2,9 +2,9 @@
 const GET_ADVICE_BTN = document.getElementById('get-advice-btn');
 const ADVICE_TEXT = document.getElementById('advice-text');
 const LOADING_SPINNER = document.getElementById('loading-spinner');
-const NO_ADVICE_MESSAGE = 'There is no advice to give. Please come back later.';
-const LOAD_ERROR_MESSAGE = 'Failed to load advice. Please try again later.';
-const INITIAL_MESSAGE = 'Click the button to get some grate advice.';
+const NO_ADVICE_MESSAGE = 'No News Now. New News Near.';
+const LOAD_ERROR_MESSAGE = 'Fatal Fetch Failure.';
+const INITIAL_MESSAGE = 'Click Control to Collect Cheesy Counsel.';
 
 const CHEESE_PUNS = {
   'good': 'gouda',
