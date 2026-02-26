@@ -65,7 +65,7 @@ def test_get_advice(page: Page):
 def test_fetch_error(page: Page):
     """Verifies error handling when fetch fails."""
     # Intercept the request to api.adviceslip.com/advice and fail it
-    page.route("**/advice", lambda route: route.abort())
+    page.route("**/advice*", lambda route: route.abort())
 
     # Force non-joke path to trigger fetch
     page.add_init_script("Math.random = () => 0.5;")
@@ -81,7 +81,7 @@ def test_fetch_error(page: Page):
 def test_cheeseify_logic(page: Page):
     """Verifies that advice text is correctly 'cheeseified'."""
     # Mock the API response with specific text to test replacements
-    page.route("**/advice", lambda route: route.fulfill(
+    page.route("**/advice*", lambda route: route.fulfill(
         status=200,
         body='{"slip": { "id": 1, "advice": "Hello friend, I believe this is good." }}'
     ))
@@ -130,7 +130,7 @@ def test_loading_state(page: Page):
         route_container.append(route)
         # Do not fulfill here to keep request pending
 
-    page.route("**/advice", handler)
+    page.route("**/advice*", handler)
 
     # Force non-joke path so it fetches advice
     page.add_init_script("Math.random = () => 0.5;")
