@@ -67,7 +67,7 @@ function cheeseify(text) {
  * @returns {Promise<string>} A promise that resolves to a single advice string.
  */
 async function fetchAdvice() {
-    const response = await fetch('https://api.adviceslip.com/advice');
+    const response = await fetch('https://api.adviceslip.com/advice?t=' + Date.now());
     if (!response.ok) {
         throw new Error('Failed to load advice');
     }
